@@ -27,7 +27,7 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.highgui.Highgui;
 import org.opencv.imgproc.Imgproc;
-
+//test my
 public class Macro extends JFrame {
 
 	public Macro() {
