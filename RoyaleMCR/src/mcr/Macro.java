@@ -27,6 +27,7 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.highgui.Highgui;
 import org.opencv.imgproc.Imgproc;
+
 //test my
 public class Macro extends JFrame {
 
@@ -78,89 +79,94 @@ class BtnListener implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 
-      if (e.getActionCommand().equals("Start")) {
-         try {
-            Robot robot;
+		final Mat templateimg = Highgui
+				.imread("./resource/realtime/srcimg.png");
+		
+		if (e.getActionCommand().equals("Start")) {
+			try {
+				while(true)
+				{
+				Robot robot;
 
-            robot = new Robot();
+				robot = new Robot();
 
-            Rectangle area = new Rectangle(Toolkit.getDefaultToolkit()
-                  .getScreenSize());
+				Rectangle area = new Rectangle(Toolkit.getDefaultToolkit()
+						.getScreenSize());
 
-            BufferedImage bufImage = null;
-            bufImage = robot.createScreenCapture(area);
-            
-            
-            //ImageIO.write(bufImage, "png", new File("./resource/realtime/test.png"));            
-            //Mat srcimg= Highgui.imread("./resource/realtime/test.png");   
-            
-            Mat srcimg = img2Mat(bufImage);
-            final Mat templateimg =Highgui.imread("./resource/realtime/srcimg.png");   
-            
-            
-            int result_cols = srcimg.cols() - templateimg.cols() + 1;
-             int result_rows = srcimg.rows() - templateimg.rows() + 1;
-             Mat result = new Mat(result_rows, result_cols, CvType.CV_8UC3);
-             // ½ºÅ©¸° Ä¸ÃÄ.
-            //         
-            
-            Imgproc.matchTemplate(srcimg, templateimg, result, Imgproc.TM_SQDIFF);//method=CV_TM_SQDIFF);
-            Core.normalize(result, result, 0, 1, Core.NORM_MINMAX, -1, new Mat());
-              //Highgui.imwrite("./resource/realtime/out2.png", result);
-             MinMaxLocResult mmr = Core.minMaxLoc(result);
+				BufferedImage bufImage = null;
+				bufImage = robot.createScreenCapture(area);
 
-                 final Point matchLoc;
-//                 if (match_method == Imgproc.TM_SQDIFF
-//                         || match_method == Imgproc.TM_SQDIFF_NORMED) {
-//                     matchLoc = mmr.minLoc;
-//                     System.out.println(mmr.minVal);
-//                 } else {
-                 matchLoc = mmr.minLoc;
-                 //matchLoc = mmr.maxLoc;
-//                     System.out.println(mmr.maxVal);
-//                 }
+				// ImageIO.write(bufImage, "png", new
+				// File("./resource/realtime/test.png"));
+				// Mat srcimg= Highgui.imread("./resource/realtime/test.png");
 
-                 //
-               Window w=new Window(null)
-               {
-                 public void paint(Graphics g)
-                 {
-                   g.setColor(Color.RED);                  
-                   g.drawRoundRect((int)(matchLoc.x), (int)(matchLoc.y), templateimg.width(),templateimg.height(), 2, 2);
-                 }
-                 public void update(Graphics g)
-                 {
-                   paint(g);
-                 }
-               };
-               w.setAlwaysOnTop(true);
-               w.setBounds(w.getGraphicsConfiguration().getBounds());
-               w.setBackground(new Color(0, true));
-               w.setVisible(true);
-               //
-                 // / Show me what you got
-                 Core.rectangle(srcimg, matchLoc, new Point(matchLoc.x + templateimg.cols(),
-                         matchLoc.y + templateimg.rows()), new Scalar(0, 255, 0));
+				Mat srcimg = img2Mat(bufImage);
+				
 
-                 // Save the visualized detection.
-                 //System.out.println("Writing " + outFile);
-              //   Highgui.imwrite("./resource/realtime/out2.png", srcimg);
+				int result_cols = srcimg.cols() - templateimg.cols() + 1;
+				int result_rows = srcimg.rows() - templateimg.rows() + 1;
+				Mat result = new Mat(result_rows, result_cols, CvType.CV_8UC3);
+				// ½ºÅ©¸° Ä¸ÃÄ.
+				//
 
-            
+				Imgproc.matchTemplate(srcimg, templateimg, result,
+						Imgproc.TM_SQDIFF);// method=CV_TM_SQDIFF);
+				Core.normalize(result, result, 0, 1, Core.NORM_MINMAX, -1,
+						new Mat());
+				// Highgui.imwrite("./resource/realtime/out2.png", result);
+				MinMaxLocResult mmr = Core.minMaxLoc(result);
 
-         } catch (Exception e1) {
-            e1.printStackTrace();
-         }
+				final Point matchLoc;
+				// if (match_method == Imgproc.TM_SQDIFF
+				// || match_method == Imgproc.TM_SQDIFF_NORMED) {
+				// matchLoc = mmr.minLoc;
+				// System.out.println(mmr.minVal);
+				// } else {
+				matchLoc = mmr.minLoc;
+				// matchLoc = mmr.maxLoc;
+				// System.out.println(mmr.maxVal);
+				// }
+				//
 
-      } else if (e.getActionCommand().equals("Stop")) {
-         Runtime.getRuntime().exit(0);
-      }
-   }
-	
+				Window w = new Window(null) {
+					public void paint(Graphics g) {
+						g.setColor(Color.RED);
+						g.drawRoundRect((int) (matchLoc.x), (int) (matchLoc.y),
+								templateimg.width(), templateimg.height(), 2, 2);
+					}
+				};
+				w.setAlwaysOnTop(true);
+				w.setBounds(w.getGraphicsConfiguration().getBounds());
+				w.setBackground(new Color(0, true));
+				w.setVisible(true);
+				Thread.sleep(10);
+				
+				w.dispose();
+				//
+				// / Show me what you got
+				Core.rectangle(srcimg, matchLoc, new Point(matchLoc.x
+						+ templateimg.cols(), matchLoc.y + templateimg.rows()),
+						new Scalar(0, 255, 0));
+
+				// Save the visualized detection.
+				// System.out.println("Writing " + outFile);
+				// Highgui.imwrite("./resource/realtime/out2.png", srcimg);
+				}
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+
+		} else if (e.getActionCommand().equals("Stop")) {
+			Runtime.getRuntime().exit(0);
+		}
+	}
+
 	public static Mat img2Mat(BufferedImage in) {
 		Mat out = new Mat(in.getHeight(), in.getWidth(), CvType.CV_8UC3);
-		byte[] data = new byte[in.getWidth() * in.getHeight() * (int) out.elemSize()];
-		int[] dataBuff = in.getRGB(0, 0, in.getWidth(), in.getHeight(), null, 0, in.getWidth());
+		byte[] data = new byte[in.getWidth() * in.getHeight()
+				* (int) out.elemSize()];
+		int[] dataBuff = in.getRGB(0, 0, in.getWidth(), in.getHeight(), null,
+				0, in.getWidth());
 		for (int i = 0; i < dataBuff.length; i++) {
 			data[i * 3] = (byte) ((dataBuff[i]));
 			data[i * 3 + 1] = (byte) ((dataBuff[i]));
