@@ -195,14 +195,13 @@ class Thd_Global_Img extends Thread {
 
 class Utils
 {
-	public double getCreatedLocation(String img, double x, double y)
+	public void getCreatedLocation(String img, double x, double y)
 	{
 		String temp[] = img.split("/");
 		String name = temp[temp.length-1];
 		name = name.substring(0,name.length()-4);
 		
 		System.out.println(name+"      "+x+"      "+y);
-		return 0;
 	}
 }
 // ㅎㅎㅎ
