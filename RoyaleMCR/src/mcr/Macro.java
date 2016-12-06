@@ -201,7 +201,7 @@ class Utils
 		String name = temp[temp.length-1];
 		name = name.substring(0,name.length()-4);
 		
-		System.out.println(name+"     "+x+"     "+y);
+		System.out.println(name+"      "+x+"      "+y);
 		return 0;
 	}
 }
