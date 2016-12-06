@@ -32,30 +32,30 @@ import org.opencv.imgproc.Imgproc;
 public class Macro extends JFrame {
 
 	public Macro() {
-		// Á¦¸ñ ¼³Á¤
+		// ì œëª© ì„¤ì •
 		JButton start = new JButton("Start");
 		JButton stop = new JButton("Stop");
 		JButton pause = new JButton("Pause");
 
-		// ·¹ÀÌ¾Æ¿ô ¼³Á¤
+		// ë ˆì´ì•„ì›ƒ ì„¤ì •
 		this.setLayout(new FlowLayout());
 
 		start.addActionListener(new BtnListener());
 		stop.addActionListener(new BtnListener());
 		pause.addActionListener(new BtnListener());
 
-		// ¹öÆ° Ãß°¡
+		// ë²„íŠ¼ ì¶”ê°€
 		this.add(start);
 		this.add(stop);
 		this.add(pause);
 
-		// ÇÁ·¹ÀÓ Å©±â ÁöÁ¤
+		// í”„ë ˆìž„ í¬ê¸° ì§€ì •
 		this.setSize(300, 400);
 
-		// ÇÁ·¹ÀÓ º¸ÀÌµµ·Ï ¼³Á¤
+		// í”„ë ˆìž„ ë³´ì´ë„ë¡ ì„¤ì •
 		this.setVisible(true);
 
-		// X¹öÆ° ´­·¶À» ¶§ ´ÝÈ÷µµ·Ï ¼³Á¤
+		// Xë²„íŠ¼ ëˆŒë €ì„ ë•Œ ë‹«ížˆë„ë¡ ì„¤ì •
 
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -76,92 +76,33 @@ public class Macro extends JFrame {
 class BtnListener implements ActionListener {
 	BtnListener() {
 	}
-
+	
 	public void actionPerformed(ActionEvent e) {
-
-		final Mat templateimg = Highgui
-				.imread("./resource/realtime/srcimg.png");
-		
+	
+	
 		if (e.getActionCommand().equals("Start")) {
-			try {
-				while(true)
-				{
-				Robot robot;
+			Thd_Global_Img  globalImage=new Thd_Global_Img();
+			globalImage.start();
 
-				robot = new Robot();
-
-				Rectangle area = new Rectangle(Toolkit.getDefaultToolkit()
-						.getScreenSize());
-
-				BufferedImage bufImage = null;
-				bufImage = robot.createScreenCapture(area);
-
-				// ImageIO.write(bufImage, "png", new
-				// File("./resource/realtime/test.png"));
-				// Mat srcimg= Highgui.imread("./resource/realtime/test.png");
-
-				Mat srcimg = img2Mat(bufImage);
-				
-
-				int result_cols = srcimg.cols() - templateimg.cols() + 1;
-				int result_rows = srcimg.rows() - templateimg.rows() + 1;
-				Mat result = new Mat(result_rows, result_cols, CvType.CV_8UC3);
-				// ½ºÅ©¸° Ä¸ÃÄ.
-				//
-
-				Imgproc.matchTemplate(srcimg, templateimg, result,
-						Imgproc.TM_SQDIFF);// method=CV_TM_SQDIFF);
-				Core.normalize(result, result, 0, 1, Core.NORM_MINMAX, -1,
-						new Mat());
-				// Highgui.imwrite("./resource/realtime/out2.png", result);
-				MinMaxLocResult mmr = Core.minMaxLoc(result);
-
-				final Point matchLoc;
-				// if (match_method == Imgproc.TM_SQDIFF
-				// || match_method == Imgproc.TM_SQDIFF_NORMED) {
-				// matchLoc = mmr.minLoc;
-				// System.out.println(mmr.minVal);
-				// } else {
-				matchLoc = mmr.minLoc;
-				// matchLoc = mmr.maxLoc;
-				// System.out.println(mmr.maxVal);
-				// }
-				//
-
-				Window w = new Window(null) {
-					public void paint(Graphics g) {
-						g.setColor(Color.RED);
-						g.drawRoundRect((int) (matchLoc.x), (int) (matchLoc.y),
-								templateimg.width(), templateimg.height(), 2, 2);
-					}
-				};
-				w.setAlwaysOnTop(true);
-				w.setBounds(w.getGraphicsConfiguration().getBounds());
-				w.setBackground(new Color(0, true));
-				w.setVisible(true);
-				Thread.sleep(10);
-				
-				w.dispose();
-				//
-				// / Show me what you got
-				Core.rectangle(srcimg, matchLoc, new Point(matchLoc.x
-						+ templateimg.cols(), matchLoc.y + templateimg.rows()),
-						new Scalar(0, 255, 0));
-
-				// Save the visualized detection.
-				// System.out.println("Writing " + outFile);
-				// Highgui.imwrite("./resource/realtime/out2.png", srcimg);
-				}
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
-
-		} else if (e.getActionCommand().equals("Stop")) {
+		} else if (e.getActionCommand().equals("Stop")) {			
 			Runtime.getRuntime().exit(0);
+		}
+		else if(e.getActionCommand().equals("Pause")){			
+			// ì¸ìŠ¤í„´ìŠ¤í™”ëœ Thd_Global_Imgë¥¼ ì°¾ì„ ìˆ˜ë§Œ ìžˆë‹¤ë©´ êµ¬í˜„ Â‰ 
 		}
 	}
 
-	public static Mat img2Mat(BufferedImage in) {
+	
+}
+
+class Thd_Global_Img extends Thread {
+	Utils utils = new Utils();
+	String img = "./resource/realtime/redMemi.png";
+	Mat imgs = Highgui.imread(img);
+	final Mat templateimg = imgs;
+	Rectangle area = null;
+	Window w =null;
+	public Mat img2Mat(BufferedImage in) {
 		Mat out = new Mat(in.getHeight(), in.getWidth(), CvType.CV_8UC3);
 		byte[] data = new byte[in.getWidth() * in.getHeight()
 				* (int) out.elemSize()];
@@ -175,5 +116,93 @@ class BtnListener implements ActionListener {
 		out.put(0, 0, data);
 		return out;
 	}
+
+	public void run() {
+    	try {
+			
+			while(true)
+			{
+			Robot robot = new Robot();
+			area = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+			BufferedImage bufImage = robot.createScreenCapture(area);
+			Mat srcimg = img2Mat(bufImage);
+			// ImageIO.write(bufImage, "png", new
+			// File("./resource/realtime/test.png"));
+			// Mat srcimg= Highgui.imread("./resource/realtime/test.png");
+
+
+			int result_cols = srcimg.cols() - templateimg.cols() + 1;
+			int result_rows = srcimg.rows() - templateimg.rows() + 1;
+			Mat result = new Mat(result_rows, result_cols, CvType.CV_8UC3);
+			// ìŠ¤í¬ë¦° ìº¡ì³.
+			//
+			int method =Imgproc.TM_CCOEFF_NORMED;
+			Imgproc.matchTemplate(srcimg, templateimg, result,
+					method); //TM_SQDIFF);// method=CV_TM_SQDIFF);
+			Core.normalize(result, result, 0, 1, Core.NORM_MINMAX, -1,
+					new Mat());
+			// Highgui.imwrite("./resource/realtime/out2.png", result);
+			MinMaxLocResult mmr = Core.minMaxLoc(result);
+			/*
+			if(mmr.maxVal>0.9)
+				System.out.println("Gotcha! value :"+mmr.maxVal);
+			else
+				System.out.println("No! value :"+mmr.maxVal);
+			 */
+			final Point matchLoc;
+			if(method==Imgproc.TM_SQDIFF||method==Imgproc.TM_SQDIFF_NORMED)
+				matchLoc = mmr.minLoc;
+			else
+				matchLoc = mmr.maxLoc;
+
+			w = new Window(null) {
+				public void paint(Graphics g) {
+					g.setColor(Color.RED);
+					g.drawRoundRect((int) (matchLoc.x), (int) (matchLoc.y),
+							templateimg.width(), templateimg.height(), 2, 2);
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			};
+			
+			w.setAlwaysOnTop(true);
+			w.setBounds(w.getGraphicsConfiguration().getBounds());
+			w.setBackground(new Color(0, true));
+			w.setVisible(true);
+			Thread.sleep(100);				
+			w.dispose();
+			//
+			// / Show me what you got
+			Core.rectangle(srcimg, matchLoc, new Point(matchLoc.x
+					+ templateimg.cols(), matchLoc.y + templateimg.rows()),
+					new Scalar(0, 255, 0));
+			// ì¢Œí‘œí‘œì‹œ
+			utils.getCreatedLocation(img, matchLoc.x, matchLoc.y);
+			
+			// Save the visualized detection.
+			// System.out.println("Writing " + outFile);
+			// Highgui.imwrite("./resource/realtime/out2.png", srcimg);
+			}
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+    } // run
+} // Thread1_1
+
+class Utils
+{
+	public double getCreatedLocation(String img, double x, double y)
+	{
+		String temp[] = img.split("/");
+		String name = temp[temp.length-1];
+		name = name.substring(0,name.length()-4);
+		
+		System.out.println(name+"     "+x+"     "+y);
+		return 0;
+	}
 }
-// ¤¾¤¾¤¾
+// ã…Žã…Žã…Ž
